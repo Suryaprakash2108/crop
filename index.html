@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crop Prediction Forest Assistant</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --forest-green-dark: #1B4332;
+            --forest-green-medium: #2D6A4F;
+            --forest-green-light: #52B788;
+            --forest-green-pale: #95D5B2;
+            --forest-background: #D8F3DC;
+        }
+        body {
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--forest-background);
+            color: var(--forest-green-dark);
+            line-height: 1.6;
+            background-image: linear-gradient(to bottom, rgba(216, 243, 220, 0.9), rgba(216, 243, 220, 0.9)), 
+                              url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%"><defs><pattern id="pattern" width="100" height="100" patternUnits="userSpaceOnUse"><path d="M0 100 Q50 50 100 100 Z" fill="none" stroke="%2352B788" stroke-width="1" opacity="0.1"/></pattern></defs><rect width="100%" height="100%" fill="url(%23pattern)"/></svg>');
+        }
+        .container {
+            max-width: 600px;
+            margin: 40px auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(45, 106, 79, 0.2);
+            border: 2px solid var(--forest-green-light);
+        }
+        h2 {
+            color: var(--forest-green-dark);
+            text-align: center;
+            margin-bottom: 25px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid var(--forest-green-medium);
+            font-weight: 700;
+        }
+        .input-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+        .input-group::before {
+            content: '🌱';
+            position: absolute;
+            left: -30px;
+            top: 35px;
+            font-size: 20px;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--forest-green-medium);
+            font-weight: 600;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--forest-green-pale);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            background-color: #f0f9f4;
+        }
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--forest-green-light);
+            box-shadow: 0 0 0 3px rgba(82, 183, 136, 0.2);
+        }
+        .tooltip {
+            color: var(--forest-green-medium);
+            font-size: 0.8em;
+            margin-top: 5px;
+            font-style: italic;
+        }
+        #predict-btn {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--forest-green-medium);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        #predict-btn:hover {
+            background-color: var(--forest-green-dark);
+            transform: translateY(-3px);
+            box-shadow: 0 4px 15px rgba(45, 106, 79, 0.3);
+        }
+        #result {
+            margin-top: 25px;
+            text-align: center;
+            font-weight: bold;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: #f0f9f4;
+            border: 2px solid var(--forest-green-pale);
+        }
+        @media (max-width: 768px) {
+            .input-group::before {
+                display: none;
+            }
+            .container {
+                margin: 20px;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>🌿 Crop Prediction Forest Assistant</h2>
+        <div class="input-group">
+            <label for="N">Nitrogen (N) Level</label>
+            <input type="number" id="N" required min="0" max="1000">
+            <div class="tooltip">Soil nitrogen content (0-1000)</div>
+        </div>
+        <div class="input-group">
+            <label for="P">Phosphorus (P) Level</label>
+            <input type="number" id="P" required min="0" max="1000">
+            <div class="tooltip">Soil phosphorus content (0-1000)</div>
+        </div>
+        <div class="input-group">
+            <label for="K">Potassium (K) Level</label>
+            <input type="number" id="K" required min="0" max="1000">
+            <div class="tooltip">Soil potassium content (0-1000)</div>
+        </div>
+        <div class="input-group">
+            <label for="temperature">Temperature (°C)</label>
+            <input type="number" id="temperature" step="0.1" required min="-50" max="50">
+            <div class="tooltip">Average temperature in Celsius</div>
+        </div>
+        <div class="input-group">
+            <label for="humidity">Humidity (%)</label>
+            <input type="number" id="humidity" step="0.1" required min="0" max="100">
+            <div class="tooltip">Relative humidity percentage</div>
+        </div>
+        <div class="input-group">
+            <label for="ph">Soil pH</label>
+            <input type="number" id="ph" step="0.1" required min="0" max="14">
+            <div class="tooltip">Soil acidity/alkalinity level</div>
+        </div>
+        <div class="input-group">
+            <label for="rainfall">Rainfall (mm)</label>
+            <input type="number" id="rainfall" step="0.1" required min="0" max="5000">
+            <div class="tooltip">Annual rainfall in millimeters</div>
+        </div>
+        <button id="predict-btn" onclick="predictCrop()">Predict My Crop</button>
+        <p id="result"></p>
+    </div>
+
+    <script>
+        async function predictCrop() {
+            const inputs = ['N', 'P', 'K', 'temperature', 'humidity', 'ph', 'rainfall'];
+            for (let input of inputs) {
+                const element = document.getElementById(input);
+                if (!element.value) {
+                    alert(`Please enter a value for ${element.previousElementSibling.textContent}`);
+                    element.focus();
+                    return;
+                }
+            }
+        
+            try {
+                const N = document.getElementById("N").value;
+                const P = document.getElementById("P").value;
+                const K = document.getElementById("K").value;
+                const temperature = document.getElementById("temperature").value;
+                const humidity = document.getElementById("humidity").value;
+                const ph = document.getElementById("ph").value;
+                const rainfall = document.getElementById("rainfall").value;
+        
+                const response = await fetch("http://127.0.0.1:5000/predict", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ N, P, K, temperature, humidity, ph, rainfall })
+                });
+        
+                if (!response.ok) {
+                    throw new Error('Prediction failed. Please check your inputs.');
+                }
+        
+                const result = await response.json();
+                document.getElementById("result").innerHTML = `🌾 Predicted Crop: <strong>${result.predicted_crop}</strong>`;
+                document.getElementById("result").style.color = 'var(--forest-green-dark)';
+            } catch (error) {
+                document.getElementById("result").innerHTML = `❌ ${error.message}`;
+                document.getElementById("result").style.color = '#D8315B';
+            }
+        }
+    </script>
+</body>
+</html>
